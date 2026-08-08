@@ -1,0 +1,703 @@
+# 🩺 SkinCheck AI — Explainable Skin Disease Risk Screener
+
+An **Explainable AI-based skin disease risk screening application** that analyzes an uploaded skin-lesion image and predicts the most likely lesion category, provides a confidence score, assigns a **Low / Medium / High risk level**, and generates a **Grad-CAM heatmap** to visualize the region of the image that influenced the model's prediction.
+
+> ⚠️ **Medical Disclaimer:** SkinCheck AI is an educational and research-oriented screening aid. It is **not a medical diagnostic system** and should not be used as a substitute for examination or advice from a qualified healthcare professional.
+
+---
+
+## 📌 Project Overview
+
+SkinCheck AI combines **Deep Learning, Computer Vision, Explainable AI, and Flask** to create an interpretable skin-lesion screening system.
+
+Traditional deep-learning image classifiers can behave like "black boxes": they produce a prediction without explaining why.
+
+SkinCheck AI addresses this problem by incorporating **Grad-CAM (Gradient-weighted Class Activation Mapping)**. The system produces a heatmap that highlights the image regions that contributed most strongly to the model's prediction.
+
+### 🔄 Application Workflow
+
+```text
+                ┌─────────────────────┐
+                │   Upload Skin Image │
+                └──────────┬──────────┘
+                           │
+                           ▼
+                ┌─────────────────────┐
+                │ Image Preprocessing │
+                │ Resize + Normalize  │
+                └──────────┬──────────┘
+                           │
+                           ▼
+                ┌─────────────────────┐
+                │ Deep Learning Model │
+                └──────────┬──────────┘
+                           │
+                 ┌─────────┴─────────┐
+                 ▼                   ▼
+        ┌────────────────┐   ┌─────────────────┐
+        │ Disease Class  │   │ Confidence      │
+        │ Prediction     │   │ Score           │
+        └───────┬────────┘   └────────┬────────┘
+                │                     │
+                └──────────┬──────────┘
+                           ▼
+                ┌─────────────────────┐
+                │ Risk Classification │
+                │ Low / Medium / High │
+                └──────────┬──────────┘
+                           │
+                           ▼
+                ┌─────────────────────┐
+                │      Grad-CAM       │
+                │ Explain Prediction  │
+                └──────────┬──────────┘
+                           │
+                           ▼
+                ┌─────────────────────┐
+                │ Flask Web Interface │
+                └─────────────────────┘
+```
+
+---
+
+# ✨ Key Features
+
+### 🖼️ 1. Skin Image Upload
+
+Users can upload an image of a skin lesion through the web interface.
+
+Supported image formats can include:
+
+* JPG
+* JPEG
+* PNG
+
+---
+
+### 🤖 2. Skin Lesion Classification
+
+The trained deep-learning model predicts one of the supported lesion classes.
+
+The project uses the following class labels:
+
+| Code    | Lesion Category                               |
+| ------- | --------------------------------------------- |
+| `akiec` | Actinic Keratoses / Intraepithelial Carcinoma |
+| `bcc`   | Basal Cell Carcinoma                          |
+| `bkl`   | Benign Keratosis-like Lesions                 |
+| `df`    | Dermatofibroma                                |
+| `mel`   | Melanoma                                      |
+| `nv`    | Melanocytic Nevus                             |
+| `vasc`  | Vascular Lesions                              |
+
+> The exact performance and reliability of predictions depend on the training dataset, model architecture, preprocessing, and validation procedure.
+
+---
+
+### 📊 3. Confidence Score
+
+The application displays the model's confidence/probability associated with its predicted class.
+
+Example:
+
+```text
+Predicted Class: Melanoma
+Confidence: 91.42%
+```
+
+A confidence score represents the model's estimated probability, **not a medical certainty**.
+
+---
+
+### 🚦 4. Risk Level
+
+The predicted lesion category is mapped to a screening-oriented risk level:
+
+```text
+LOW
+MEDIUM
+HIGH
+```
+
+Example:
+
+```text
+Disease: Melanoma
+Confidence: 91.42%
+Risk Level: HIGH
+```
+
+Risk labels are intended only for this application's screening workflow and should not be interpreted as clinical diagnosis.
+
+---
+
+# 🔍 Explainable AI with Grad-CAM
+
+One of the main features of SkinCheck AI is **Grad-CAM**.
+
+## What is Grad-CAM?
+
+Grad-CAM stands for:
+
+**Gradient-weighted Class Activation Mapping**
+
+It is an Explainable AI technique that helps visualize the areas of an image that contributed to a neural network's prediction.
+
+Instead of displaying only:
+
+```text
+Prediction → Melanoma
+```
+
+SkinCheck AI attempts to provide:
+
+```text
+Prediction → Melanoma
+
+        +
+        
+Explanation → Heatmap showing influential image regions
+```
+
+### Example workflow
+
+```text
+Original Image
+      │
+      ▼
+Deep Learning Model
+      │
+      ▼
+Predicted Class
+      │
+      ▼
+Grad-CAM
+      │
+      ▼
+Heatmap
+      │
+      ▼
+Overlay on Original Image
+```
+
+This makes the system more interpretable than a conventional black-box classifier.
+
+---
+
+# 🧠 Machine Learning / Deep Learning Pipeline
+
+The project follows a standard computer-vision pipeline.
+
+### Step 1 — Image Collection
+
+Skin-lesion images are collected from an appropriate dataset.
+
+### Step 2 — Data Preprocessing
+
+Images are processed before being passed to the model.
+
+Typical preprocessing includes:
+
+* Image resizing
+* Pixel normalization
+* Label encoding
+* Dataset splitting
+* Data augmentation where appropriate
+
+### Step 3 — Model Training
+
+A deep-learning image classification model is trained using the processed images.
+
+### Step 4 — Model Evaluation
+
+The trained model can be evaluated using metrics such as:
+
+* Accuracy
+* Precision
+* Recall
+* F1-score
+* Confusion Matrix
+
+### Step 5 — Model Serialization
+
+The trained model is saved for use by the Flask application.
+
+### Step 6 — Prediction
+
+The Flask backend receives an uploaded image and passes it through the trained model.
+
+### Step 7 — Explainability
+
+Grad-CAM generates an activation heatmap for the predicted class.
+
+### Step 8 — Result Display
+
+The application displays:
+
+* Predicted lesion type
+* Confidence score
+* Risk level
+* Grad-CAM visualization
+* Medical disclaimer
+
+---
+
+# 🏗️ Project Architecture
+
+```text
+SkinCheck-AI/
+│
+├── app.py
+│
+├── model/
+│   ├── model.pkl / trained_model
+│   ├── scaler.pkl
+│   └── feature_names.pkl
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   │
+│   ├── uploads/
+│   │
+│   └── results/
+│
+├── templates/
+│   ├── index.html
+│   ├── about.html
+│   ├── prediction.html
+│   ├── dashboard.html
+│   └── contact.html
+│
+├── 04_gradcam_explainability.py
+│
+├── requirements.txt
+│
+├── README.md
+│
+└── .gitignore
+```
+
+> Adjust the model filenames and folder structure to match the final implementation.
+
+---
+
+# 🛠️ Technologies Used
+
+## Programming Language
+
+* Python
+
+## Machine Learning / Deep Learning
+
+* TensorFlow
+* Keras
+* NumPy
+* OpenCV
+* Scikit-learn
+
+## Explainable AI
+
+* Grad-CAM
+
+## Web Development
+
+* Flask
+* HTML5
+* CSS3
+* JavaScript
+
+## Data Processing
+
+* Pandas
+* NumPy
+
+## Development Tools
+
+* Jupyter Notebook
+* VS Code
+* Git
+* GitHub
+
+---
+
+# 📦 Installation
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/SkinCheck-AI.git
+```
+
+Move into the project directory:
+
+```bash
+cd SkinCheck-AI
+```
+
+---
+
+## 2. Create a Virtual Environment
+
+### Windows
+
+```bash
+python -m venv venv
+```
+
+Activate it:
+
+```bash
+venv\Scripts\activate
+```
+
+### Linux / macOS
+
+```bash
+python3 -m venv venv
+```
+
+Activate:
+
+```bash
+source venv/bin/activate
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+If a `requirements.txt` file has not been created yet, common dependencies include:
+
+```text
+Flask
+tensorflow
+keras
+numpy
+pandas
+opencv-python
+scikit-learn
+Pillow
+matplotlib
+```
+
+---
+
+# ▶️ Running the Application
+
+Start the Flask application:
+
+```bash
+python app.py
+```
+
+You should see something similar to:
+
+```text
+Running on http://127.0.0.1:5000
+```
+
+Open your browser and visit:
+
+```text
+http://localhost:5000
+```
+
+---
+
+# 🖥️ Application Pages
+
+## 🏠 Home
+
+Introduces SkinCheck AI and provides access to the screening functionality.
+
+## 📖 About
+
+Explains:
+
+* Project objectives
+* AI methodology
+* Explainable AI
+* Grad-CAM
+* Limitations
+
+## 🔬 Prediction
+
+Allows users to:
+
+1. Upload a skin image
+2. Submit the image
+3. Receive the predicted lesion category
+4. View confidence
+5. View risk level
+6. View Grad-CAM explanation
+
+## 📊 Dashboard
+
+Can display project/model information and prediction-related statistics.
+
+## 📩 Contact
+
+Provides project or developer contact information.
+
+---
+
+# 📈 Model Evaluation
+
+The model should be evaluated using a separate test dataset.
+
+Recommended evaluation metrics include:
+
+### Accuracy
+
+```text
+Accuracy = Correct Predictions / Total Predictions
+```
+
+### Precision
+
+Measures how many predicted positive cases were actually positive.
+
+### Recall
+
+Measures how many actual positive cases were correctly identified.
+
+### F1-Score
+
+Provides a balance between precision and recall.
+
+### Confusion Matrix
+
+Helps identify which lesion classes are being confused by the model.
+
+Example evaluation:
+
+```text
+              precision    recall    f1-score
+
+Class 1          0.XX       0.XX        0.XX
+Class 2          0.XX       0.XX        0.XX
+Class 3          0.XX       0.XX        0.XX
+...
+```
+
+Replace these placeholders with the actual results from your trained model.
+
+---
+
+# 🔬 Grad-CAM Implementation
+
+The project contains a dedicated explainability module:
+
+```text
+04_gradcam_explainability.py
+```
+
+The module performs tasks such as:
+
+```text
+Input Image
+    ↓
+Preprocessing
+    ↓
+Model Prediction
+    ↓
+Target Class
+    ↓
+Gradient Calculation
+    ↓
+Activation Map
+    ↓
+Heatmap
+    ↓
+Heatmap + Original Image
+```
+
+The final visualization helps users understand **which image regions influenced the prediction**.
+
+---
+
+# 🔐 Privacy Considerations
+
+Skin images may contain sensitive personal information.
+
+The application should therefore:
+
+* Avoid unnecessarily storing uploaded images.
+* Delete temporary images when they are no longer required.
+* Avoid exposing uploaded images publicly.
+* Avoid storing personally identifiable information.
+* Secure any database used by the application.
+* Use HTTPS when deployed to production.
+
+---
+
+# ⚠️ Limitations
+
+SkinCheck AI has several important limitations.
+
+### 1. Not a Diagnostic Tool
+
+The model cannot replace a dermatologist or other qualified healthcare professional.
+
+### 2. Dataset Bias
+
+Model performance may vary depending on:
+
+* Skin tone
+* Image quality
+* Camera/device
+* Lighting
+* Dataset composition
+* Lesion type
+
+### 3. Confidence ≠ Accuracy
+
+A high confidence score does not guarantee that the prediction is correct.
+
+### 4. Grad-CAM ≠ Clinical Explanation
+
+A Grad-CAM heatmap indicates areas that influenced the neural network's decision. It does **not** prove that the highlighted area represents a medically meaningful lesion.
+
+### 5. Real-World Generalization
+
+A model performing well on a test dataset may perform differently on images collected in real-world environments.
+
+---
+
+# 🚨 Medical Disclaimer
+
+> **IMPORTANT:** SkinCheck AI is intended strictly for educational, research, and screening purposes. It does not provide medical diagnosis, treatment recommendations, or professional medical advice. Predictions generated by the application should not be used to make healthcare decisions. If you have a concerning, changing, painful, bleeding, or otherwise suspicious skin lesion, consult a qualified healthcare professional.
+
+---
+
+# 🔮 Future Enhancements
+
+Possible future improvements include:
+
+* [ ] Improve model accuracy
+* [ ] Add additional skin-lesion classes
+* [ ] Implement stronger data augmentation
+* [ ] Add model comparison
+* [ ] Add precision/recall/F1 dashboard
+* [ ] Add confusion-matrix visualization
+* [ ] Improve Grad-CAM visualization
+* [ ] Add patient-independent validation
+* [ ] Add image-quality assessment
+* [ ] Add authentication
+* [ ] Add secure prediction history
+* [ ] Deploy using Docker
+* [ ] Deploy to a cloud platform
+* [ ] Add model monitoring
+* [ ] Add fairness evaluation across different skin tones
+* [ ] Add automated deletion of uploaded images
+
+---
+
+# 📚 Dataset
+
+The project can be developed using a publicly available skin-lesion image dataset such as the **HAM10000 dataset**.
+
+The dataset contains dermatoscopic images representing multiple categories of pigmented and non-pigmented skin lesions.
+
+Before using any dataset, review its official license and terms of use.
+
+---
+
+# 📁 Important Files
+
+| File                           | Purpose                                        |
+| ------------------------------ | ---------------------------------------------- |
+| `app.py`                       | Flask backend                                  |
+| `04_gradcam_explainability.py` | Grad-CAM implementation                        |
+| `model/`                       | Trained model and supporting files             |
+| `templates/`                   | HTML pages                                     |
+| `static/`                      | CSS, JavaScript, uploads and generated results |
+| `requirements.txt`             | Python dependencies                            |
+| `README.md`                    | Project documentation                          |
+
+---
+
+# 🎯 Project Objectives
+
+The primary objectives of SkinCheck AI are:
+
+1. Build an AI-powered skin-lesion screening application.
+2. Classify skin-lesion images using deep learning.
+3. Provide model confidence information.
+4. Categorize predictions into screening-oriented risk levels.
+5. Improve model interpretability using Grad-CAM.
+6. Provide an easy-to-use web interface.
+7. Demonstrate responsible and explainable AI in healthcare-oriented applications.
+
+---
+
+# 💡 Why This Project?
+
+SkinCheck AI demonstrates the combination of several important data-science and AI technologies:
+
+```text
+Python
+   +
+Deep Learning
+   +
+Computer Vision
+   +
+Explainable AI
+   +
+Flask
+   +
+Web Development
+   =
+SkinCheck AI
+```
+
+The project is particularly useful for demonstrating knowledge of:
+
+* Deep Learning
+* Image Classification
+* Transfer Learning
+* Computer Vision
+* Explainable AI
+* Model Evaluation
+* Flask Deployment
+* End-to-End AI Application Development
+
+---
+
+# 👩‍💻 Author
+
+**Anjali Sharma**
+
+MCA — Himachal Pradesh Technical University
+
+### Areas of Interest
+
+* Data Science
+* Machine Learning
+* Deep Learning
+* Python
+* SQL
+* Explainable AI
+* Data Analytics
+
+---
+
+# ⭐ GitHub
+
+If you find this project useful, consider giving the repository a ⭐.
+
+```text
+SkinCheck AI
+Explainable Skin Disease Risk Screener
+```
+
+---
+
+## ⚠️ Final Note
+
+This project demonstrates how AI and Explainable AI techniques can be integrated into a healthcare-oriented screening application. It should be treated as a **technical/educational project rather than a clinically validated medical device**.
